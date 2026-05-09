@@ -1,0 +1,25 @@
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+
+# Données lourdes / brutes
+data_raw/
+archive_data/
+archive_old/
+data_processed/
+
+# Fichiers temporaires
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+
+# Fichiers temporaires Excel
+~$*.xlsx
+~$*.csv
+
+# Résultats ou modèles futurs
+models/
+results/
+*.pkl
+*.joblib

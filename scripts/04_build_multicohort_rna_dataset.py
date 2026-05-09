@@ -6,13 +6,13 @@ print("--- FUSION RNA MULTICOHORTE CORRIGÉE ---")
 # =========================
 # FICHIERS
 # =========================
-FICHIER_RNA_91061 = "2_BULK_RNA_expression_GSE91061_symboles.csv"
-FICHIER_RNA_78220 = "2_BULK_RNA_expression_GSE78220_nettoyee.csv"
-FICHIER_CLINIQUE = "1_CLINIQUE_MULTICOHORTE_nettoyee.csv"
-FICHIER_SCORE = "data/2_BULK_RNA_score_immunitaire_cytolytique.txt"
+FICHIER_RNA_91061 = "data_processed/2_BULK_RNA_expression_GSE91061_symboles.csv"
+FICHIER_RNA_78220 = "data_processed/2_BULK_RNA_expression_GSE78220_nettoyee.csv"
+FICHIER_CLINIQUE = "data_processed/1_CLINIQUE_MULTICOHORTE_nettoyee.csv"
+FICHIER_SCORE = "data_raw/2_BULK_RNA_score_immunitaire_cytolytique.txt"
 
-FICHIER_SORTIE = "3_DATASET_RNA_MULTICOHORTE_FINAL.csv"
-
+FICHIER_SORTIE_COMPLET = "data_processed/3_DATASET_RNA_MULTICOHORTE_FINAL.csv"
+FICHIER_SORTIE_ML = "data_processed/3_DATASET_RNA_MULTICOHORTE_ML_READY.csv"
 # =========================
 # 1. CHARGEMENT DES FICHIERS
 # =========================
@@ -105,19 +105,73 @@ df_final = df_final.dropna(subset=["survival_event"]).copy()
 df_final["survival_event"] = df_final["survival_event"].astype(int)
 
 # =========================
-# 10. SAUVEGARDE
+# 10. SAUVEGARDE VERSION COMPLÈTE
 # =========================
-df_final.to_csv(FICHIER_SORTIE, index=False)
 
-print("✅ Fusion terminée.")
-print("Fichier créé :", FICHIER_SORTIE)
-print("Dimensions finales :", df_final.shape)
+df_final.to_csv(FICHIER_SORTIE_COMPLET, index=False)
+
+print("✅ Fusion complète terminée.")
+print("Fichier complet créé :", FICHIER_SORTIE_COMPLET)
+print("Dimensions version complète :", df_final.shape)
+
+
+# =========================
+# 11. CRÉATION VERSION ML READY
+# =========================
+# Objectif : garder uniquement les colonnes utiles pour le modèle.
+#
+# Colonnes conservées :
+# - identifiants : patient_id, study
+# - cible : survival_event
+# - réponse clinique brute : response
+# - features RNA : tous les gènes communs
+#
+# Colonnes retirées :
+# - response_binary : doublon de survival_event
+# - cytolytic_score : non disponible pour toutes les cohortes
+# - colonnes cliniques très incomplètes pour GSE91061
+
+metadata_cols_ml = [
+    "patient_id",
+    "study",
+    "response",
+    "survival_event"
+]
+
+# Les gènes sont les colonnes communes trouvées plus haut
+gene_cols_ml = genes_communs
+
+# On garde uniquement les colonnes qui existent vraiment
+metadata_cols_ml = [col for col in metadata_cols_ml if col in df_final.columns]
+gene_cols_ml = [col for col in gene_cols_ml if col in df_final.columns]
+
+df_ml_ready = df_final[metadata_cols_ml + gene_cols_ml].copy()
+
+# Sécurité : supprimer les lignes sans label
+df_ml_ready = df_ml_ready.dropna(subset=["survival_event"]).copy()
+
+# Conversion propre de la cible
+df_ml_ready["survival_event"] = df_ml_ready["survival_event"].astype(int)
+
+# Sauvegarde version ML
+df_ml_ready.to_csv(FICHIER_SORTIE_ML, index=False)
+
+print("\n✅ Version ML ready créée.")
+print("Fichier ML ready créé :", FICHIER_SORTIE_ML)
+print("Dimensions version ML ready :", df_ml_ready.shape)
+
+
+# =========================
+# 12. RÉSUMÉ FINAL
+# =========================
 
 print("\nDistribution des cohortes :")
-print(df_final["study"].value_counts())
+print(df_ml_ready["study"].value_counts())
 
 print("\nDistribution de la cible survival_event :")
-print(df_final["survival_event"].value_counts())
+print(df_ml_ready["survival_event"].value_counts())
 
 print("\nColonnes principales :")
-print(df_final[["patient_id", "study", "response", "survival_event", "cytolytic_score"]].head())
+print(df_ml_ready[["patient_id", "study", "response", "survival_event"]].head())
+
+print("\nNombre de gènes conservés dans ML ready :", len(gene_cols_ml))

@@ -1,6 +1,9 @@
 <p align="center">
-  <img src="logoMelanoma.png" alt="Logo Melanoma" width="300"/>
+  <img src="assets/logoMelanoma.png" alt="Logo Melanoma" width="300"/>
 </p>
+
+# Melanoma Immunotherapy Data Pipeline
+
 
 # Melanoma Immunotherapy Data Pipeline
 

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logoMelanoma.png" alt="Logo Melanoma" width="300"/>
+</p>
+
 # Melanoma Immunotherapy Data Pipeline
 
 ## 1. Résumé du projet

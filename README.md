@@ -4,9 +4,6 @@
 
 # Melanoma Immunotherapy Data Pipeline
 
-
-# Melanoma Immunotherapy Data Pipeline
-
 ## 1. Résumé du projet
 
 Ce projet porte sur la préparation de données transcriptomiques de patients atteints de mélanome afin de permettre, dans une étape ultérieure, le développement de modèles de machine learning ou de deep learning pour étudier la réponse aux traitements.
